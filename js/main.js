@@ -1,22 +1,15 @@
 //Example fetch using pokemonapi.co
 document.querySelector('button').addEventListener('click', getFetch)
 const section =  document.querySelector('section')
+let pokeRoster = JSON.parse(localStorage.getItem('pokemons')) || []
 function getFetch(){
   const poke1 = document.querySelector('#poke1').value
-  const url = `https://pokeapi.co/api/v2/pokemon/${poke1}`
- // const url2 = 'https://pokeapi.co/api/v2/pokemon/'+poke2
+  const url = `https://pokeapi.co/api/v2/pokemon/${poke1.toLowerCase()}`
   let pokeStore = []
   let pokeImg = []
-
   fetch(url)
       .then(res => res.json()) // parse response as JSON
       .then(data => {
-        console.log(data)
-        // document.getElementById('pokeImg2').src = data['sprites']['front_default']
-        // document.querySelector('h3').innerText = poke1
-        // document.querySelector('#skill1').innerText = data['moves'][0]['move']['name']
-        // document.querySelector('#skill2').innerText = data['moves'][1]['move']['name']
-
         // create a div give it the class card
         const card = document.createElement('div')
         const moves = document.createElement('div')
@@ -28,6 +21,7 @@ function getFetch(){
         const remove = document.createElement('button')
 
         card.classList.toggle('card')
+        card.id = poke1
         moves.classList.toggle('moves')
         img.src = data['sprites']['front_default']
         h3.innerText = poke1
@@ -47,22 +41,26 @@ function getFetch(){
         // add th einner text remove 
       
         // append the p elements to the div wqiht the class name move
-        moves.appendChild(p1)
-        moves.appendChild(p2)
-        card.appendChild(h3)
-        card.appendChild(img)
-        card.appendChild(h4)
-        card.appendChild(moves)
-        card.appendChild(remove)
+        moves.append(p1,p2)
+        card.append(h3, img, h4, moves, remove)
         section.appendChild(card)
         // append h3 to card
         // append img to card
         // append h4 to card
         // append move to card
         // append button to card
-      
+
         // localStorage
-        localStorage.setItem('section', section)
+         let pokemon = {
+           nameOf: poke1,
+           skillMove1: data['moves'][0]['move']['name'],
+           skillMove2: data['moves'][1]['move']['name'],
+           img: data['sprites']['front_default'],
+         }
+         pokeRoster.push(pokemon)
+         document.querySelector('#poke1').value= ''
+        console.log(pokeRoster)
+        localStorage.setItem('pokemons', JSON.stringify(pokeRoster))
         pokeStore.push(data.types[0].type.name)
         pokeImg.push(data.sprites.front_shiny)
         .catch(err => {
@@ -79,28 +77,31 @@ function getFetch(){
 
       
 }
-if(!localStorage.getItem('section')){
-  localStorage.setItem('section', section)
-} else {
-  document.querySelector('body').appendChild(section)
+if(pokeRoster.length >= 1){
+  pokeRoster.forEach(x => {
+    const card = document.createElement('div')
+    const moves = document.createElement('div')
+    const img = document.createElement('img')
+    const h3 = document.createElement('h3')
+    const h4 = document.createElement('h4')
+    const p1 = document.createElement('p')
+    const p2 = document.createElement('p')
+    const remove = document.createElement('button')
+
+    card.classList.toggle('card')
+    card.id = poke1
+    moves.classList.toggle('moves')
+    img.src = x['img']
+    h3.innerText = x['nameOf']
+    h4.innerText = 'Skill Moves'
+    p1.innerText = x['skillMove1']
+    p2.innerText = x['skillMove2']
+    remove.innerText = 'Remove From Roster'
+    remove.classList.toggle('remove')
+
+    moves.append(p1,p2)
+    card.append(h3, img, h4, moves, remove)
+    section.appendChild(card)
+  })
 }
-// enter pokemon name
-// on click display image, the number of pokemone entered it top 2 moves
-// add local storage 
 
-// fetch(url2)
-// .then(res => res.json()) // parse response as JSON
-// .then(data => {
-//    //console.log(data)
-//   // pokeStore.push(data.types[0].type.name)
-//   // pokeImg.push(data.sprites.front_shiny)
-
-//   if((pokeStore[0] === "grass" && pokeStore[1] === 'water')){
-//     document.querySelector('#pokeImg1').src = pokeImg[0]
-//     document.querySelector('#pokeImg2').src = pokeImg[1]
-//     document.querySelector('h2').innerText = " 2x > "
-//   }
-// })
-
-// pokeStore.push(data.types[0].type.name)
-// pokeImg.push(data.sprites.front_shiny)
